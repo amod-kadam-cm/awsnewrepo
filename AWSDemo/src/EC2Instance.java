@@ -25,8 +25,8 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 public class EC2Instance {
 
 	
-	static final String accessKey = "AKIAICW46AB5ALZP6WJQ";
-	static final String secretKey = "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";
+	static final String accessKey = "acceesky";
+	static final String secretKey = "secretkey";
 	static AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 	static AmazonEC2 ec2 = new AmazonEC2Client(credentials);
 	static String ImageID,InstanceType,SecurityGp,KeyName,StartInstanceID,StopInstanceID,TerInstanceID;
@@ -48,7 +48,7 @@ public class EC2Instance {
 	        System.out.println("11\t EU (Frankfurt)");
 	        System.out.println("12\t EU (Ireland)");
 	        System.out.println("13\t EU (London)");
-	        System.out.println("14\t South America (São Paulo)");
+	        System.out.println("14\t South America (Sï¿½o Paulo)");
 	        System.out.println("Please enter your Region choice:");
 	        
 	        //Get user's choice
