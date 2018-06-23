@@ -1,0 +1,54 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Parameters" : {
+    "ParamSubnetCIDR" : {
+      "Type" : "String",
+      "Default" : "10.0.16.0/20"
+    }
+  },
+  "Resources" : {
+    "AmodDemoVPC" : {
+      "Type" : "AWS::EC2::VPC",
+      "Properties" : {
+        "CidrBlock" : "10.0.0.0/16",
+        "EnableDnsSupport" : "true",
+        "EnableDnsHostnames" : "true",
+        "InstanceTenancy" : "default",
+        "Tags" : [ {
+          "Key" : "client",
+          "Value" : "MH"
+        } ]
+      }
+    },
+    "AmodDemoSubnet" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "AmodDemoVPC"
+        },
+        "CidrBlock" : "10.0.0.0/20",
+        "AvailabilityZone" : "us-east-1a",
+        "Tags" : [ {
+          "Key" : "client",
+          "Value" : "MH"
+        } ]
+      }
+    },
+    "AnotherSubnet" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "AmodDemoVPC"
+        },
+        "CidrBlock" : {
+          "Ref" : "ParamSubnetCIDR"
+        },
+        "AvailabilityZone" : "us-east-1a",
+        "Tags" : [ {
+          "Key" : "foo",
+          "Value" : "bar"
+        } ]
+      }
+    }
+  }
+}

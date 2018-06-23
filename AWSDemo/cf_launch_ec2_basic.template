@@ -1,0 +1,13 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Launches a basic EC2 Instance with key pair - add tags such as",
+  "Resources" : {
+    "ManagmentMentInstance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : "ami-7c554716"
+       
+      }
+    }
+  }
+}
