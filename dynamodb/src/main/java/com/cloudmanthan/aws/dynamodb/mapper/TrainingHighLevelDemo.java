@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.dynamodb;
+package com.cloudmanthan.aws.dynamodb.mapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,11 @@ import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
+import com.amazonaws.services.dynamodbv2.model.GlobalSecondaryIndex;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.Projection;
+import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemResult;
@@ -41,19 +44,20 @@ public class TrainingHighLevelDemo {
 	static DynamoDBMapper mapper;
 
 	public static void main(String[] args) {
-
-		// AmazonDynamoDB client =
-		// AmazonDynamoDBClientBuilder.standard().build();
+		// Comment out the required calls 
 		initLocal();
+		
+		//createTable();
 
-		// putItem();
-		//getItem();
-		// updateItem();
+		 putItem();
+		 getItem();
+		updateItem();
+		// read updated values
 		getItem();
-		//scanTable();
-		//queryTable();
+		scanTable();
+		queryTable();
 		// query using GSI
-		//queryUsingIndex();
+		queryUsingIndex();
 		
 		queryUsingLSI();
 	}
@@ -73,7 +77,8 @@ public class TrainingHighLevelDemo {
 			queryExpression.withHashKeyValues(trainingItem);
 			Condition rangeKeyCondition = new Condition();
 			rangeKeyCondition.setComparisonOperator("EQ");
-			rangeKeyCondition.withAttributeValueList(new AttributeValue().withN("4"));
+			//rangeKeyCondition.withAttributeValueList(new AttributeValue().withN("4"));
+			rangeKeyCondition.withAttributeValueList(new AttributeValue().withN("20"));
 
 			
 			queryExpression.withIndexName("trainingdurationlsi").withRangeKeyCondition("TrainingDuration", rangeKeyCondition);
@@ -102,8 +107,7 @@ public class TrainingHighLevelDemo {
 	private static void putItem() {
 
 		try {
-			DynamoDBMapper mapper = new DynamoDBMapper(client);
-
+			
 			TrainingItem item = new TrainingItem();
 
 			item.setCustomerShortName("SEED");
@@ -127,21 +131,27 @@ public class TrainingHighLevelDemo {
 
 		client = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
 				new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-east-1")).build();
+		
+	    mapper = new DynamoDBMapper(client);
+
 
 	}
 
 	private static void createTable() {
 		try {
-			CreateTableRequest request = new CreateTableRequest()
-					.withAttributeDefinitions(new AttributeDefinition("CustomerShortName", ScalarAttributeType.S),
-							new AttributeDefinition("ForClient", ScalarAttributeType.S))
-					.withKeySchema(new KeySchemaElement("CustomerShortName", KeyType.HASH),
-							new KeySchemaElement("ForClient", KeyType.RANGE))
-					.withProvisionedThroughput(new ProvisionedThroughput(new Long(10), new Long(10)));
-
-			request.setTableName("Training");
-
-			client.createTable(request);
+		
+		
+			 
+			 CreateTableRequest req = mapper.generateCreateTableRequest(TrainingItem.class);
+			 
+			
+			 // Table provision throughput is still required since it cannot be specified in your POJO
+			
+			 req.setProvisionedThroughput(new ProvisionedThroughput(5L, 5L));
+			 req.getGlobalSecondaryIndexes().iterator().next().setProvisionedThroughput(new ProvisionedThroughput(5L, 5L));
+			 // Fire off the CreateTableRequest using the low-level client
+			 client.createTable(req);
+			
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -157,6 +167,8 @@ public class TrainingHighLevelDemo {
 			String hashKey = "SEED";
 			String rangeKey = "Zensar";
 			TrainingItem item = mapper.load(TrainingItem.class, hashKey, rangeKey);
+			
+		    System.out.println("TrainingItem " + item);
 
 			
 		} catch (Exception e) {
@@ -173,7 +185,9 @@ public class TrainingHighLevelDemo {
 
 			item.setCustomerShortName("SEED");
 			item.setForClient("Zensar");
+			// Update the training duration 
 			item.setTrainingDuration(20);
+			// Update training platform
 			item.setTrainingPlatform("AWS and Azure");
 
 			Set<String> locations = new HashSet<String>(Arrays.asList("Pune"));
@@ -300,8 +314,8 @@ public class TrainingHighLevelDemo {
 			DynamoDBQueryExpression<TrainingItem> queryExpression = new DynamoDBQueryExpression<TrainingItem>();
 	
 			TrainingItem hashKeyValues = new TrainingItem();
-			hashKeyValues.setTrainingPlatform("AWS");
-			//hashKeyValues.setTrainingPlatform("AWS and Azure");
+			//hashKeyValues.setTrainingPlatform("AWS");
+			hashKeyValues.setTrainingPlatform("AWS and Azure");
 	
 			queryExpression.withHashKeyValues(hashKeyValues);
 			Condition rangeKeyCondition = new Condition();

@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.dynamodb;
+package com.cloudmanthan.aws.dynamodb.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 
-@DynamoDBTable(tableName="TrainingLSI")
+@DynamoDBTable(tableName="TrainingIndex")
 public class TrainingItem {
 	  
     
