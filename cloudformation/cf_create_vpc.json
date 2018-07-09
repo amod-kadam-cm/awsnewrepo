@@ -1,0 +1,93 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description":"Building A VPC from Scratch with CloudFormation",
+  "Parameters" : {
+      "AMI":{
+        "Type" : "AWS::EC2::Image::Id",
+        "Description" : "Specify the imaged id"
+      }
+    
+  },
+  
+  "Resources" :{
+    "VPC":{
+      "Type" :"AWS::EC2::VPC",
+      "Properties":{
+        "EnableDnsSupport":"true",
+        "EnableDnsHostnames":"true",
+        "CidrBlock":"10.0.0.0/16",
+        "Tags":[
+          {"Key":"Application","Value":{"Ref":"AWS::StackName"}},
+          {"Key":"Network","Value":"Public"}
+        ]
+      }
+    },
+    
+    "PublicSubnet":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{"Ref":"VPC"},
+        "CidrBlock":"10.0.0.0/24",
+        "Tags":[
+          {"Key":"Application","Value":{"Ref":"AWS::StackName"}},
+          {"Key":"Network","Value":"Public"}
+        ]        
+      }
+    },
+      
+      "TestInternetGateway":{
+        "Type" : "AWS::EC2::InternetGateway"
+      },
+      
+      "GatewaytoInternet":{
+        "Type":"AWS::EC2::VPCGatewayAttachment",
+        "Properties":{
+          "VpcId":{"Ref":"VPC"},
+          "InternetGatewayId":{"Ref":"TestInternetGateway"}
+        }
+      },
+      
+      "PublicRouteTable" :{
+        "Type":"AWS::EC2::RouteTable",
+        "Properties":{
+          "VpcId":{"Ref":"VPC"}
+      }
+      },
+      
+      "PublicRoute":{
+        "Type":"AWS::EC2::Route",
+        "DependsOn":"GatewaytoInternet",
+        "Properties":{
+          "RouteTableId":{"Ref":"PublicRouteTable"},
+          "DestinationCidrBlock":"0.0.0.0/0",
+          "GatewayId":{"Ref":"TestInternetGateway"}
+        }
+      },
+      
+      "PublicSubnetRouteAssociation":{
+        "Type":"AWS::EC2::SubnetRouteTableAssociation",
+        "Properties":{
+          "SubnetId":{"Ref":"PublicSubnet"},
+          "RouteTableId":{"Ref":"PublicRouteTable"}
+        }
+      },
+      
+      
+      "PublicInstance":{
+        "Type":"AWS::EC2::Instance",
+        "DependsOn" :"GatewaytoInternet",
+        "Properties":{
+          "InstanceType":"t2.micro",
+          "ImageId": { "Ref": "myImage"},
+          "NetworkInterfaces":[{
+            "AssociatePublicIpAddress":"true",
+            "DeviceIndex":"0",
+            "DeleteOnTermination":"true",
+            "SubnetId":{"Ref":"PublicSubnet"}
+        }]
+      }
+      
+    }
+    
+    }
+  } 
