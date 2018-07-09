@@ -14,7 +14,14 @@
      "MaxLength" : "8",
       "NoEcho" : "true"
    
+  },
+  "GroupParameter" : {
+    "Type" : "String",
+     "MinLength" : "1",
+     "MaxLength" : "8"
+      
   }
+  
   
   
   },
@@ -25,8 +32,29 @@
         "UserName" : {"Ref" : "UserNameParameter" },
         "Path": "/lti/",
         "LoginProfile" : {  "Password" : {"Ref" : "PasswordParameter"}}
+      
       }
       
+    },
+    
+"addUserToGroup" : {
+   "Type" : "AWS::IAM::UserToGroupAddition",
+   "Properties" : {
+      "GroupName" : {"Ref":"myGroup"},
+      "Users" : [ {"Ref" : "myUser" } ]
+   }
+},    
+    "myGroup" :{
+      
+      "Type" : "AWS::IAM::Group",
+      "Properties" : {
+        "GroupName" : { "Ref" : "GroupParameter"},
+        "Path" : "/lti/",
+        "ManagedPolicyArns" : ["arn:aws:iam::297106433303:policy/AllowUSRegionOnly"]
+        
+        
+        
+      }
     }
     
     
