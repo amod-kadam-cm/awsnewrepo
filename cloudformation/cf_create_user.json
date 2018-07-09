@@ -1,62 +1,75 @@
-{ 
-  "AWSTemplateFormatVersion" : "2010-09-09",
-  "Description" : "Let us build AWS estate using CloudFormation template",
-  "Parameters" : {
-    "UserNameParameter" : {
-    "Type" : "String",
-    "Default" : "username",
-    "Description" : "Specify the username to be used"
-  },
-    "PasswordParameter" : {
-    "Type" : "String",
-    "Default" : "password",
-     "MinLength" : "1",
-     "MaxLength" : "8",
-      "NoEcho" : "true"
-   
-  },
-  "GroupParameter" : {
-    "Type" : "String",
-     "MinLength" : "1",
-     "MaxLength" : "8"
-      
-  }
-  
-  
-  
-  },
-  "Resources" : {
-    "myUser" : {
-      "Type" : "AWS::IAM::User",
-      "Properties" : {
-        "UserName" : {"Ref" : "UserNameParameter" },
-        "Path": "/lti/",
-        "LoginProfile" : {  "Password" : {"Ref" : "PasswordParameter"}}
-      
-      }
-      
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Let us build AWS estate using CloudFormation template",
+  "Parameters": {
+    "UserNameParameter": {
+      "Type": "String",
+      "Default": "username",
+      "Description": "Specify the username to be used"
     },
-    
-"addUserToGroup" : {
-   "Type" : "AWS::IAM::UserToGroupAddition",
-   "Properties" : {
-      "GroupName" : {"Ref":"myGroup"},
-      "Users" : [ {"Ref" : "myUser" } ]
-   }
-},    
-    "myGroup" :{
-      
-      "Type" : "AWS::IAM::Group",
-      "Properties" : {
-        "GroupName" : { "Ref" : "GroupParameter"},
-        "Path" : "/lti/",
-        "ManagedPolicyArns" : ["arn:aws:iam::297106433303:policy/AllowUSRegionOnly"]
-        
-        
-        
+    "PasswordParameter": {
+      "Type": "String",
+      "Default": "password",
+      "MinLength": "1",
+      "MaxLength": "8",
+      "NoEcho": "true"
+    },
+    "GroupParameter": {
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "8"
+    }
+  },
+  "Resources": {
+    "myUser": {
+      "Type": "AWS::IAM::User",
+      "Properties": {
+        "UserName": {
+          "Ref": "UserNameParameter"
+        },
+        "Path": "/lti/",
+        "LoginProfile": {
+          "Password": {
+            "Ref": "PasswordParameter"
+          }
+        }
+      }
+    },
+    "addUserToGroup": {
+      "Type": "AWS::IAM::UserToGroupAddition",
+      "Properties": {
+        "GroupName": {
+          "Ref": "myGroup"
+        },
+        "Users": [
+          {
+            "Ref": "myUser"
+          }
+        ]
+      }
+    },
+    "myGroup": {
+      "Type": "AWS::IAM::Group",
+      "Properties": {
+        "GroupName": {
+          "Ref": "GroupParameter"
+        },
+        "Path": "/lti/",
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:iam::",
+                {
+                  "Ref": "AWS::AccountId"
+                },
+                ":policy/AllowUSRegionOnly"
+              ]
+            ]
+          }
+        ]
       }
     }
-    
-    
   }
 }
