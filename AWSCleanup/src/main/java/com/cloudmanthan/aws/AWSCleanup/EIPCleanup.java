@@ -1,5 +1,7 @@
 package com.cloudmanthan.aws.AWSCleanup;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -34,6 +36,12 @@ public class EIPCleanup {
 
 		String profile = "amod_cmworkshop";
 		AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
+		Set<String> regionSet = new HashSet<String>();
+
+		regionSet.add("us-gov-west-1");
+		regionSet.add("cn-north-1");
+		regionSet.add("cn-northwest-1");
+
 
 		// iterate for all regions
 
@@ -43,8 +51,8 @@ public class EIPCleanup {
 
 			String regionName = region.getName() ;
 			// Don't do any operations on gov_cloud
-			if (regionName != "us-gov-west-1"  || regionName != "cn-north-1") {
-
+			if (regionSet.contains(regionName) == false) {
+					
 				// String region = regions.g
 				ec2 = AmazonEC2ClientBuilder.standard().withCredentials(awsCreds).withRegion(region.getName()).build();
 

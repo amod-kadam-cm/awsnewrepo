@@ -21,6 +21,7 @@ import com.amazonaws.services.ec2.model.DescribeAddressesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeKeyPairsRequest;
 import com.amazonaws.services.ec2.model.DescribeKeyPairsResult;
+import com.amazonaws.services.ec2.model.DescribeVpcsResult;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceExportDetails;
 import com.amazonaws.services.ec2.model.KeyPairInfo;
@@ -29,6 +30,7 @@ import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.Vpc;
 import com.amazonaws.services.elasticache.AmazonElastiCache;
 import com.amazonaws.services.elasticache.AmazonElastiCacheClient;
 import com.amazonaws.services.elasticache.AmazonElastiCacheClientBuilder;
@@ -71,12 +73,8 @@ public class EC2Cleanup {
 
 			String regionName = region.getName();
 
-			// if ( regionName.equals("us-gov-west-1") == false ||
-			// regionName.equals("cn-north-1") == false ) {
-
-			// if ( regionName.compareTo("us-gov-west-1") != 0 ) {
 			if (regionSet.contains(regionName) == false) {
-				;
+				
 				// String region = regions.g
 				ec2Client = AmazonEC2ClientBuilder.standard().withCredentials(awsCreds).withRegion(region.getName())
 						.build();
@@ -113,7 +111,10 @@ public class EC2Cleanup {
 						String instanceId = instance.getInstanceId();
 						Calendar workShopcal = Calendar.getInstance();
 						// TODO : Parameterize it to accept the from date and todate
-						workShopcal.set(2018, 5, 26);
+						workShopcal.clear();
+						workShopcal.set(2018, 6, 10);
+						
+						
 
 						Calendar launchCal = Calendar.getInstance();
 
@@ -128,7 +129,8 @@ public class EC2Cleanup {
 
 							if (true == Arrays.asList("running", "pending", "stopping", "stopped")
 									.contains(instance.getState().getName())) {
-
+							
+								
 								ModifyInstanceAttributeRequest modRequest = new ModifyInstanceAttributeRequest();
 
 								modRequest.setInstanceId(instanceId);
@@ -144,11 +146,23 @@ public class EC2Cleanup {
 
 								request.setInstanceIds(instanceIds);
 
+								LOGGER.info("TERMINATING  instance id " + instance.getInstanceId()
+								+ " launched on " + launchDate);
 								ec2Client.terminateInstances(request);
 							}
 
 						}
 					}
+
+				}
+				
+				DescribeVpcsResult result = ec2Client.describeVpcs();
+				
+				List<Vpc> vpcs = result.getVpcs();
+
+				for (Vpc vpc : vpcs) {
+						
+					
 
 				}
 
