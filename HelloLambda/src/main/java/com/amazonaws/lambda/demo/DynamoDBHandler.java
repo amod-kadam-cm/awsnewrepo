@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
@@ -28,6 +29,7 @@ public class DynamoDBHandler implements RequestStreamHandler {
 	JSONParser parser = new JSONParser();
 	AmazonDynamoDB client;
 	DynamoDBMapper mapper;
+	TrainingItemDAO trainingItemDAO = new TrainingItemDAO();
 
 	public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
 
@@ -38,6 +40,7 @@ public class DynamoDBHandler implements RequestStreamHandler {
 
 		JSONObject responseJson = new JSONObject();
 		String name = "you";
+		String customerShortName = null;
 		String city = "World";
 		String time = "day";
 		String day = null;
@@ -45,28 +48,54 @@ public class DynamoDBHandler implements RequestStreamHandler {
 
 		String platform;
 		String topic;
-		String forclient;
+		String forclient = null;
 		Integer duration;
 		Boolean won;
 		String location;
-
+		String message = null;
 
 		String httpMethod = null;
 		String output = null;
 		try {
 			JSONObject event = (JSONObject) parser.parse(reader);
 
+			JSONObject responseBody = new JSONObject();
+			responseBody.put("input", event.toJSONString());
+
 			if (event.get("httpMethod") != null) {
 
 				httpMethod = (String) event.get("httpMethod");
 				logger.log("httpMethod is " + httpMethod);
-
 			}
+			
 			if (event.get("queryStringParameters") != null) {
 				JSONObject qps = (JSONObject) event.get("queryStringParameters");
-				if (qps.get("name") != null) {
-					name = (String) qps.get("name");
+				if (qps.get("CustomerShortName") != null) {
+					customerShortName = (String) qps.get("CustomerShortName");
 				}
+				
+				if (qps.get("forClient") != null) {
+					forclient = (String) qps.get("forClient");
+				}
+				// if it is GET 
+				if (httpMethod.equalsIgnoreCase("get") == true) {
+
+					List<TrainingItem> trainingItemList = trainingItemDAO.query(logger, customerShortName, forclient);
+					for (TrainingItem item : trainingItemList) {
+						message = message + item.toString();
+					}
+					responseBody.put("message", message);
+				}
+
+			} else {
+				if (httpMethod.equalsIgnoreCase("get") == true) {
+
+					List<TrainingItem> trainingItemList = trainingItemDAO.scan(logger);
+					for (TrainingItem item : trainingItemList) {
+						message = message + item.toString();
+					}
+					responseBody.put("message", message);
+								}
 			}
 
 			if (event.get("pathParameters") != null) {
@@ -88,7 +117,7 @@ public class DynamoDBHandler implements RequestStreamHandler {
 				JSONObject body = (JSONObject) parser.parse((String) event.get("body"));
 
 				if (body.get("CustomerShortName") != null) {
-					String customerShortName = (String) body.get("CustomerShortName");
+					customerShortName = (String) body.get("CustomerShortName");
 					trainingItem.setCustomerShortName(customerShortName);
 				}
 
@@ -116,10 +145,9 @@ public class DynamoDBHandler implements RequestStreamHandler {
 
 					Set<String> locations = new HashSet<String>(Arrays.asList(location));
 					trainingItem.setTrainingLocations(locations);
-					
+
 				}
-	
-				
+
 				if (body.get("duration") != null) {
 					String durationString = (String) body.get("duration");
 					trainingItem.setTrainingDuration(new Integer(durationString));
@@ -130,38 +158,26 @@ public class DynamoDBHandler implements RequestStreamHandler {
 				}
 
 				initMapper();
+
 				if (httpMethod.equalsIgnoreCase("post") == true) {
 					mapper.save(trainingItem);
-
 				} else {
-					if (httpMethod.equalsIgnoreCase("get") == true) {
-						TrainingItem item = mapper.load(trainingItem);
-						logger.log("Loaded data " + item.toString());
-					} else {
+				
 						if (httpMethod.equalsIgnoreCase("put") == true) {
 							mapper.save(trainingItem);
-							logger.log("UPDATED DATA " + trainingItem );
+							logger.log("UPDATED DATA " + trainingItem);
 						} else {
 							if (httpMethod.equalsIgnoreCase("delete") == true) {
 								mapper.delete(trainingItem);
-								logger.log("Deleted  DATA " + trainingItem );
+								logger.log("Deleted  DATA " + trainingItem);
 							}
 						}
 					}
-					
-
 				}
-
-			}
-
-			JSONObject responseBody = new JSONObject();
-			responseBody.put("input", event.toJSONString());
-
-			// responseBody.put("message", greeting);
+			
 
 			JSONObject headerJson = new JSONObject();
 			headerJson.put("x-custom-header", "my custom header value");
-
 			responseJson.put("isBase64Encoded", false);
 			responseJson.put("statusCode", responseCode);
 			responseJson.put("headers", headerJson);
