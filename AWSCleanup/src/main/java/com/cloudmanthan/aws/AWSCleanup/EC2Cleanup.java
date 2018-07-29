@@ -21,6 +21,7 @@ import com.amazonaws.services.ec2.model.Address;
 import com.amazonaws.services.ec2.model.DeleteKeyPairRequest;
 import com.amazonaws.services.ec2.model.DeleteKeyPairResult;
 import com.amazonaws.services.ec2.model.DeleteSnapshotRequest;
+import com.amazonaws.services.ec2.model.DeleteVpcRequest;
 import com.amazonaws.services.ec2.model.DeregisterImageRequest;
 import com.amazonaws.services.ec2.model.DescribeAddressesResult;
 import com.amazonaws.services.ec2.model.DescribeImagesRequest;
@@ -30,6 +31,7 @@ import com.amazonaws.services.ec2.model.DescribeKeyPairsRequest;
 import com.amazonaws.services.ec2.model.DescribeKeyPairsResult;
 import com.amazonaws.services.ec2.model.DescribeSecurityGroupsRequest;
 import com.amazonaws.services.ec2.model.DescribeSnapshotsRequest;
+import com.amazonaws.services.ec2.model.DescribeVpcsRequest;
 import com.amazonaws.services.ec2.model.DescribeVpcsResult;
 import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.Image;
@@ -41,6 +43,7 @@ import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
 import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.Snapshot;
+import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.Vpc;
 import com.amazonaws.services.elasticache.AmazonElastiCache;
@@ -62,6 +65,7 @@ import com.amazonaws.services.elasticbeanstalk.model.DescribeApplicationsResult;
 public class EC2Cleanup {
 	static Logger LOGGER = Logger.getLogger(EC2Cleanup.class.getName());
 	private static AmazonEC2 ec2Client;
+	private static CharSequence clientInitials = "jd";
 
 	public static void main(String[] args) {
 
@@ -111,7 +115,7 @@ public class EC2Cleanup {
 				Calendar workShopCal = Calendar.getInstance();
 				workShopCal.clear();
 
-				workShopCal.set(2018, Calendar.JULY, 10);
+				workShopCal.set(2018, Calendar.JULY, 25);
 
 				if (cal.after(workShopCal) == true) {
 
@@ -138,10 +142,9 @@ public class EC2Cleanup {
 	}
 
 	private static void cleanupSnapshots() {
-		
-		
+
 		DescribeSnapshotsRequest request = new DescribeSnapshotsRequest();
-		
+
 		Filter accountIdFilter = new Filter();
 
 		accountIdFilter.setName("owner-id");
@@ -154,23 +157,21 @@ public class EC2Cleanup {
 
 		Collection<Filter> filters = new ArrayList<Filter>();
 		filters.add(accountIdFilter);
-		
+
 		request.setFilters(filters);
-		
-		
+
 		com.amazonaws.services.ec2.model.DescribeSnapshotsResult result = ec2Client.describeSnapshots(request);
 
-		
-		// display only private 
-		
-		//start-time	
-		
+		// display only private
+
+		// start-time
+
 		List<Snapshot> snapList = result.getSnapshots();
-		
+
 		for (Snapshot snapshot : snapList) {
-			
+
 			Date snapShotCreationDate = snapshot.getStartTime();
-			
+
 			Calendar workShopcal = Calendar.getInstance();
 			// TODO : Parameterize it to accept the from date and to date
 			workShopcal.clear();
@@ -179,26 +180,25 @@ public class EC2Cleanup {
 			Calendar snapShotCreationCal = Calendar.getInstance();
 
 			snapShotCreationCal.setTime(snapShotCreationDate);
-			
-			if (true == snapShotCreationCal.after(workShopcal) ) {
-				
-			LOGGER.info("SNAPSHOT Information " +  snapshot.toString() );
-			
-			
-			DeleteSnapshotRequest delRequest = new DeleteSnapshotRequest();
-			
-			delRequest.withSnapshotId(snapshot.getSnapshotId());
-			LOGGER.info("Deleting SNAPSHOT  " +  snapshot.toString() );
-			
-			ec2Client.deleteSnapshot(delRequest);
-			LOGGER.info("Deleted SNAPSHOT  " +  snapshot.toString() );
-			
-			}}
 
+			if (true == snapShotCreationCal.after(workShopcal)) {
+
+				LOGGER.info("SNAPSHOT Information " + snapshot.toString());
+
+				DeleteSnapshotRequest delRequest = new DeleteSnapshotRequest();
+
+				delRequest.withSnapshotId(snapshot.getSnapshotId());
+				LOGGER.info("Deleting SNAPSHOT  " + snapshot.toString());
+
+				ec2Client.deleteSnapshot(delRequest);
+				LOGGER.info("Deleted SNAPSHOT  " + snapshot.toString());
+
+			}
+		}
 
 	}
-	
-private static void startCleanup() {
+
+	private static void startCleanup() {
 
 		String profile = "amod_cmworkshop";
 		AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
@@ -295,7 +295,7 @@ private static void startCleanup() {
 					}
 
 				}
-				
+
 				// cleanup snapshots
 				cleanupSnapshots();
 				// Cleanup AMIs
@@ -303,40 +303,70 @@ private static void startCleanup() {
 				// cleanup security groups
 				cleanupSGS();
 
+				// DescribeVpcsResult result = ec2Client.describeVpcs();
 
-				DescribeVpcsResult result = ec2Client.describeVpcs();
+				DescribeVpcsRequest req = new DescribeVpcsRequest();
+
+				Collection<Filter> filters = new HashSet<Filter>();
+
+				Filter filter = new Filter();
+				filter.setName("tag-key");
+
+				req.setFilters(filters);
+
+				DescribeVpcsResult result = ec2Client.describeVpcs(req);
 
 				List<Vpc> vpcs = result.getVpcs();
 
 				for (Vpc vpc : vpcs) {
+					
+					String vpcId = vpc.getVpcId() ;
 
-				}
+					LOGGER.info("VPC ID : " + vpcId);
 
-			} // if region !=
+					List<Tag> tagList = vpc.getTags();
+
+					for (Tag vpcTag : tagList) {
+						String tagValue = vpcTag.getValue();
+						LOGGER.info("Tag Value is " + tagValue);
+						
+						String lowerTagValue = tagValue.toLowerCase();
+						
+						if ( true == tagValue.contains(clientInitials.toString().toLowerCase() )) {
+							
+							LOGGER.info("Deleting VPC with Name : " + tagValue);
+							
+							DeleteVpcRequest delVPCReq = new DeleteVpcRequest().withVpcId(vpcId);
+							ec2Client.deleteVpc(delVPCReq );
+							
+						}
+					}
+
+				} // if region !=
+			}
 		}
 	} // for regions
 
-private static void cleanupSGS() {
-		
-	DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest();
-	
-	Filter accountIdFilter = new Filter();
+	private static void cleanupSGS() {
 
-	accountIdFilter.setName("owner-id");
+		DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest();
 
-	ArrayList<String> listValues = new ArrayList<String>();
+		Filter accountIdFilter = new Filter();
 
-	listValues.add("297106433303");
+		accountIdFilter.setName("owner-id");
 
-	accountIdFilter.setValues(listValues);
+		ArrayList<String> listValues = new ArrayList<String>();
 
-	Collection<Filter> filters = new ArrayList<Filter>();
-	filters.add(accountIdFilter);
-	
-//	request.setFilters(filters);
+		listValues.add("297106433303");
 
-	
-	ec2Client.describeSecurityGroups(req);
-		
-}
+		accountIdFilter.setValues(listValues);
+
+		Collection<Filter> filters = new ArrayList<Filter>();
+		filters.add(accountIdFilter);
+
+		// request.setFilters(filters);
+
+		ec2Client.describeSecurityGroups(req);
+
+	}
 }
