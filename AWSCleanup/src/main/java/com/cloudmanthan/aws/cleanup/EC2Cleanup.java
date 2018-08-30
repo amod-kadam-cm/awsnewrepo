@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,66 +11,62 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.Address;
 import com.amazonaws.services.ec2.model.DeleteKeyPairRequest;
 import com.amazonaws.services.ec2.model.DeleteKeyPairResult;
 import com.amazonaws.services.ec2.model.DeleteSnapshotRequest;
+import com.amazonaws.services.ec2.model.DeleteVolumeRequest;
 import com.amazonaws.services.ec2.model.DeleteVpcRequest;
 import com.amazonaws.services.ec2.model.DeregisterImageRequest;
-import com.amazonaws.services.ec2.model.DescribeAddressesResult;
 import com.amazonaws.services.ec2.model.DescribeImagesRequest;
 import com.amazonaws.services.ec2.model.DescribeImagesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.DescribeKeyPairsRequest;
 import com.amazonaws.services.ec2.model.DescribeKeyPairsResult;
 import com.amazonaws.services.ec2.model.DescribeSecurityGroupsRequest;
 import com.amazonaws.services.ec2.model.DescribeSnapshotsRequest;
+import com.amazonaws.services.ec2.model.DescribeVolumesRequest;
+import com.amazonaws.services.ec2.model.DescribeVolumesResult;
 import com.amazonaws.services.ec2.model.DescribeVpcsRequest;
 import com.amazonaws.services.ec2.model.DescribeVpcsResult;
 import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.Image;
 import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceExportDetails;
 import com.amazonaws.services.ec2.model.KeyPairInfo;
 import com.amazonaws.services.ec2.model.ModifyInstanceAttributeRequest;
-import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
-import com.amazonaws.services.ec2.model.ReleaseAddressResult;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.Snapshot;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.Volume;
 import com.amazonaws.services.ec2.model.Vpc;
-import com.amazonaws.services.elasticache.AmazonElastiCache;
-import com.amazonaws.services.elasticache.AmazonElastiCacheClient;
-import com.amazonaws.services.elasticache.AmazonElastiCacheClientBuilder;
-import com.amazonaws.services.elasticache.model.CacheCluster;
-import com.amazonaws.services.elasticache.model.DeleteCacheClusterRequest;
-import com.amazonaws.services.elasticache.model.DeleteCacheSecurityGroupRequest;
-import com.amazonaws.services.elasticache.model.DeleteReplicationGroupRequest;
-import com.amazonaws.services.elasticache.model.DescribeCacheClustersResult;
-import com.amazonaws.services.elasticache.model.DescribeSnapshotsResult;
-import com.amazonaws.services.elasticache.model.InvalidCacheClusterStateException;
-import com.amazonaws.services.elasticbeanstalk.model.ApplicationDescription;
-import com.amazonaws.services.elasticbeanstalk.model.DeleteApplicationRequest;
-import com.amazonaws.services.elasticbeanstalk.model.DeleteApplicationResult;
-import com.amazonaws.services.elasticbeanstalk.model.DescribeApplicationsRequest;
-import com.amazonaws.services.elasticbeanstalk.model.DescribeApplicationsResult;
 
 public class EC2Cleanup {
 	static Logger LOGGER = Logger.getLogger(EC2Cleanup.class.getName());
 	private static AmazonEC2 ec2Client;
 	private static CharSequence clientInitials = "jd";
 
+	static Calendar workShopCal = null;
+
 	public static void main(String[] args) {
+
+		setWorkshopDate();
 
 		startCleanup();
 
+	}
+
+	private static void setWorkshopDate() /** start the workshop date */
+	{
+
+		workShopCal = Calendar.getInstance();
+		workShopCal.clear();
+		// this is the start date of workshop
+		workShopCal.set(2018, Calendar.AUGUST, 22);
 	}
 
 	private static void cleanupAMIS() {
@@ -111,11 +107,6 @@ public class EC2Cleanup {
 				date = sdf.parse(imageCreationDate);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(date);
-
-				Calendar workShopCal = Calendar.getInstance();
-				workShopCal.clear();
-
-				workShopCal.set(2018, Calendar.JULY, 25);
 
 				if (cal.after(workShopCal) == true) {
 
@@ -174,8 +165,9 @@ public class EC2Cleanup {
 
 			Calendar workShopcal = Calendar.getInstance();
 			// TODO : Parameterize it to accept the from date and to date
-			workShopcal.clear();
-			workShopcal.set(2018, Calendar.JULY, 10);
+			/*
+			 * workShopcal.clear(); workShopcal.set(2018, Calendar.JULY, 10);
+			 */
 
 			Calendar snapShotCreationCal = Calendar.getInstance();
 
@@ -252,10 +244,6 @@ public class EC2Cleanup {
 						Date launchDate = instance.getLaunchTime();
 
 						String instanceId = instance.getInstanceId();
-						Calendar workShopcal = Calendar.getInstance();
-						// TODO : Parameterize it to accept the from date and todate
-						workShopcal.clear();
-						workShopcal.set(2018, 6, 10);
 
 						Calendar launchCal = Calendar.getInstance();
 
@@ -264,7 +252,7 @@ public class EC2Cleanup {
 						LOGGER.info(
 								"Instance with instance id " + instance.getInstanceId() + " launched on " + launchDate);
 
-						if (launchCal.after(workShopcal)) {
+						if (launchCal.after(workShopCal)) {
 							LOGGER.info("JD workshInstance with instance id " + instance.getInstanceId()
 									+ " launched on " + launchDate);
 
@@ -300,52 +288,94 @@ public class EC2Cleanup {
 				cleanupSnapshots();
 				// Cleanup AMIs
 				cleanupAMIS();
+
+				// Cleanup Volumes
+				cleanupVolumes();
 				// cleanup security groups
 				cleanupSGS();
 
-				// DescribeVpcsResult result = ec2Client.describeVpcs();
+				cleanupVPCs();
 
-				DescribeVpcsRequest req = new DescribeVpcsRequest();
+			} // if region !=
+		}
+	}
 
-				Collection<Filter> filters = new HashSet<Filter>();
+	private static void cleanupVolumes() {
 
-				Filter filter = new Filter();
-				filter.setName("tag-key");
+		DescribeVolumesRequest req = new DescribeVolumesRequest();
 
-				req.setFilters(filters);
+		Collection<Filter> filters = new HashSet<Filter>();
 
-				DescribeVpcsResult result = ec2Client.describeVpcs(req);
+		Filter filter = new Filter();
+		filter.setName("status");
 
-				List<Vpc> vpcs = result.getVpcs();
+		ArrayList<String> listValues = new ArrayList<String>();
+		listValues.add("available");
 
-				for (Vpc vpc : vpcs) {
-					
-					String vpcId = vpc.getVpcId() ;
+		filter.setValues(listValues);
+		
+		filters.add(filter);
 
-					LOGGER.info("VPC ID : " + vpcId);
+		req.setFilters(filters);
 
-					List<Tag> tagList = vpc.getTags();
+		DescribeVolumesResult volResult = ec2Client.describeVolumes(req);
 
-					for (Tag vpcTag : tagList) {
-						String tagValue = vpcTag.getValue();
-						LOGGER.info("Tag Value is " + tagValue);
-						
-						String lowerTagValue = tagValue.toLowerCase();
-						
-						if ( true == tagValue.contains(clientInitials.toString().toLowerCase() )) {
-							
-							LOGGER.info("Deleting VPC with Name : " + tagValue);
-							
-							DeleteVpcRequest delVPCReq = new DeleteVpcRequest().withVpcId(vpcId);
-							ec2Client.deleteVpc(delVPCReq );
-							
-						}
-					}
+		List<Volume> listVolumes = volResult.getVolumes();
 
-				} // if region !=
+		for (Volume vol : listVolumes) {
+			LOGGER.info("Volume id is  " + vol.getVolumeId());
+
+			LOGGER.info("Volume is " + vol.getSize());
+			
+			DeleteVolumeRequest delreq  = new DeleteVolumeRequest();
+			
+			String volumeId = vol.getVolumeId();
+			delreq.setVolumeId(volumeId );
+			// 
+			ec2Client.deleteVolume(delreq  );
+
+		}
+			}
+
+	private static void cleanupVPCs() {
+
+		DescribeVpcsRequest req = new DescribeVpcsRequest();
+
+		Collection<Filter> filters = new HashSet<Filter>();
+
+		Filter filter = new Filter();
+		filter.setName("tag-key");
+
+		req.setFilters(filters);
+
+		DescribeVpcsResult result = ec2Client.describeVpcs(req);
+
+		List<Vpc> vpcs = result.getVpcs();
+		for (Vpc vpc : vpcs) {
+
+			String vpcId = vpc.getVpcId();
+
+			LOGGER.info("VPC ID : " + vpcId);
+
+			List<Tag> tagList = vpc.getTags();
+			for (Tag vpcTag : tagList) {
+				String tagValue = vpcTag.getValue();
+				LOGGER.info("Tag Value is " + tagValue);
+
+				String lowerTagValue = tagValue.toLowerCase();
+
+				if (true == tagValue.contains(clientInitials.toString().toLowerCase())) {
+
+					LOGGER.info("Deleting VPC with Name : " + tagValue);
+
+					DeleteVpcRequest delVPCReq = new DeleteVpcRequest().withVpcId(vpcId);
+					// ec2Client.deleteVpc(delVPCReq );
+
+				}
 			}
 		}
-	} // for regions
+
+	}
 
 	private static void cleanupSGS() {
 

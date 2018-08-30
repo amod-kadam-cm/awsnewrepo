@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.util.List;
 import java.util.logging.Logger;

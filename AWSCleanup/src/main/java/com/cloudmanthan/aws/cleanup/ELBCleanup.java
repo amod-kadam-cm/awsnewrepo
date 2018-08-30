@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

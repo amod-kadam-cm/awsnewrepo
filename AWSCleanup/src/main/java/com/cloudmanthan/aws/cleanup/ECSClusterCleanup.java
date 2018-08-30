@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.util.HashSet;
 import java.util.List;
@@ -87,7 +87,6 @@ public class ECSClusterCleanup {
 
 				} // for each address
 				
-				// now clean up ECS Task Definitions
 				
 				ListTaskDefinitionsResult taskDefnResult =  ecsClient.listTaskDefinitions();
 				
@@ -96,19 +95,13 @@ public class ECSClusterCleanup {
 				for (String taskDefinition : taskDefinitionList ) {
 					LOGGER.info("Task definition " + taskDefinition);
 					
-					//DescribtTaskDefinition 
-					
-					//ecsClient.describeTaskDefinition();
+		
 					
 					DeregisterTaskDefinitionRequest request = new DeregisterTaskDefinitionRequest()
 							.withTaskDefinition(taskDefinition);
 					
 					ecsClient.deregisterTaskDefinition(request);
 				}
-				
-				
-				
-				
 			} // if region !=
 		} // for regions
 	}

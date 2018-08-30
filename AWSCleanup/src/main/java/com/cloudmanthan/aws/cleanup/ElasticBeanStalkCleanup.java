@@ -1,19 +1,13 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.Address;
-import com.amazonaws.services.ec2.model.DescribeAddressesResult;
-import com.amazonaws.services.ec2.model.ReleaseAddressRequest;
-import com.amazonaws.services.ec2.model.ReleaseAddressResult;
-
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalk;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClientBuilder;
 import com.amazonaws.services.elasticbeanstalk.model.ApplicationDescription;
@@ -36,6 +30,12 @@ public class ElasticBeanStalkCleanup {
 	private static void startCleanup() {
 
 		String profile = "amod_cmworkshop";
+		
+		Set<String> regionSet = new HashSet<String>();
+		regionSet.add("us-gov-west-1");
+		regionSet.add("cn-north-1");
+		regionSet.add("cn-northwest-1");
+		
 		AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
 
 		// iterate for all regions
@@ -46,10 +46,9 @@ public class ElasticBeanStalkCleanup {
 
 			String regionName = region.getName();
 			
-			if ( regionName.equals("us-gov-west-1") == false || regionName.equals("cn-north-1") )  {
-			// Don't do any operations on gov_cloud
-			if (regionName != "us-gov-west-1" || regionName != "cn-north-1") {
-				               
+
+			if (regionSet.contains(regionName) == false) {
+		               
 				// String region = regions.g
 				ebClient = AWSElasticBeanstalkClientBuilder.standard().withCredentials(awsCreds)
 						.withRegion(region.getName()).build();
@@ -77,4 +76,4 @@ public class ElasticBeanStalkCleanup {
 		} // for regions
 	}
 
-}
+

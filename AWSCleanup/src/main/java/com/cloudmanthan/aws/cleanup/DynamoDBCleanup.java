@@ -1,4 +1,4 @@
-package com.cloudmanthan.aws.AWSCleanup;
+package com.cloudmanthan.aws.cleanup;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -46,10 +46,13 @@ public class DynamoDBCleanup {
 
 			Date creationDate = tableDesc.getCreationDateTime();
 
-			Calendar workShopcal = Calendar.getInstance();
-			// TODO : Parameterize it to accept the from date and todate
+			/*Calendar workShopcal = Calendar.getInstance();
+			// TODO : Parameterize it to accept the from date and to date
 			workShopcal.clear();
-			workShopcal.set(2018, Calendar.JUNE, 27);
+			workShopcal.set(2018, Calendar.JULY, 25); */
+			
+			Calendar workShopcal = 
+			WorkschopCalendar.getWorksHopCalendar();
 
 			Calendar launchCal = Calendar.getInstance();
 
