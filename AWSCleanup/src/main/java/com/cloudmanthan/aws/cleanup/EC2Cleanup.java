@@ -50,7 +50,15 @@ public class EC2Cleanup {
 	private static AmazonEC2 ec2Client;
 	private static CharSequence clientInitials = "jd";
 
+	static WorkshopCalendar workshopCalendar;
+
 	static Calendar workShopCal = null;
+
+	public EC2Cleanup(Calendar startCal, Calendar endCal) {
+		workShopCal = Calendar.getInstance();
+		workShopCal.clear();
+		workShopCal.set(startCal.get(Calendar.YEAR), startCal.get(Calendar.MONTH), startCal.get(Calendar.DAY_OF_MONTH));
+	}
 
 	public static void main(String[] args) {
 
@@ -66,7 +74,8 @@ public class EC2Cleanup {
 		workShopCal = Calendar.getInstance();
 		workShopCal.clear();
 		// this is the start date of workshop
-		workShopCal.set(2018, Calendar.AUGUST, 22);
+		workShopCal.set(2018, Calendar.SEPTEMBER, 6);
+
 	}
 
 	private static void cleanupAMIS() {
@@ -190,7 +199,7 @@ public class EC2Cleanup {
 
 	}
 
-	private static void startCleanup() {
+	public static void startCleanup() {
 
 		String profile = "amod_cmworkshop";
 		AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
@@ -313,7 +322,7 @@ public class EC2Cleanup {
 		listValues.add("available");
 
 		filter.setValues(listValues);
-		
+
 		filters.add(filter);
 
 		req.setFilters(filters);
@@ -326,16 +335,16 @@ public class EC2Cleanup {
 			LOGGER.info("Volume id is  " + vol.getVolumeId());
 
 			LOGGER.info("Volume is " + vol.getSize());
-			
-			DeleteVolumeRequest delreq  = new DeleteVolumeRequest();
-			
+
+			DeleteVolumeRequest delreq = new DeleteVolumeRequest();
+
 			String volumeId = vol.getVolumeId();
-			delreq.setVolumeId(volumeId );
-			// 
-			ec2Client.deleteVolume(delreq  );
+			delreq.setVolumeId(volumeId);
+			//
+			ec2Client.deleteVolume(delreq);
 
 		}
-			}
+	}
 
 	private static void cleanupVPCs() {
 
@@ -399,4 +408,5 @@ public class EC2Cleanup {
 		ec2Client.describeSecurityGroups(req);
 
 	}
+
 }

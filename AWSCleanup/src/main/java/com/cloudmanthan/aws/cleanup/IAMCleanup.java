@@ -30,11 +30,11 @@ public class IAMCleanup {
 	
 	static String userName = null;
 	
-	static String clientInitials = "JD"; // John Deere
+	static String clientInitials = "siemens"; // John Deere
 	
 	static int EQUAL = 0;
 	
-	static Logger LOGGER = Logger.getLogger(ELBCleanup.class.getName());
+	static Logger LOGGER = Logger.getLogger(IAMCleanup.class.getName());
 	
 
 	public static void main(String[] args) {

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import com.amazonaws.services.ec2.model.DeregisterImageRequest;
-import com.cloudmanthan.aws.cleanup.LambdaCleanup;
+import com.cloudmanthan.aws.cleanup.RDSCleanup;
 
 public class CMDateUtils {
 
@@ -102,7 +102,7 @@ public class CMDateUtils {
 		Calendar workShopCal = Calendar.getInstance();
 		workShopCal.clear();
 
-		workShopCal.set(2018, Calendar.JULY, 13);
+		workShopCal.set(2018, Calendar.SEPTEMBER, 6);
 
 		if (cal.after(workShopCal) == true) {
 

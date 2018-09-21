@@ -46,13 +46,10 @@ public class DynamoDBCleanup {
 
 			Date creationDate = tableDesc.getCreationDateTime();
 
-			/*Calendar workShopcal = Calendar.getInstance();
-			// TODO : Parameterize it to accept the from date and to date
-			workShopcal.clear();
-			workShopcal.set(2018, Calendar.JULY, 25); */
+		
 			
 			Calendar workShopcal = 
-			WorkschopCalendar.getWorksHopCalendar();
+			WorkshopCalendar.getWorksHopCalendar();
 
 			Calendar launchCal = Calendar.getInstance();
 

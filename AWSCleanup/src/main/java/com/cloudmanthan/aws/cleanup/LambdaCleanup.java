@@ -16,7 +16,7 @@ import com.amazonaws.services.lambda.model.ListFunctionsResult;
 import com.cloudmanthan.aws.utils.CMDateUtils;
 
 public class LambdaCleanup {
-	static Logger LOGGER = Logger.getLogger(LambdaCleanup.class.getName());
+	static Logger LOGGER = Logger.getLogger(RDSCleanup.class.getName());
 	private static AWSLambda lambdaClient;
 	static AWSCredentialsProvider awsCreds;
 	static String profile = "amod_cmworkshop";
