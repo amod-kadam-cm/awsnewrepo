@@ -11,12 +11,12 @@ public class MasterCleanup {
 		Calendar startCal = Calendar.getInstance();
 		startCal.clear();
 		// this is the start date of workshop
-		startCal.set(2018, Calendar.SEPTEMBER, 6);
+		startCal.set(2018, Calendar.OCTOBER, 22);
 		
 		Calendar endCal = Calendar.getInstance();
 		endCal.clear();
 		// this is the start date of workshop
-		endCal.set(2018, Calendar.SEPTEMBER, 10);
+		endCal.set(2018, Calendar.OCTOBER ,26);
 	
 		// set the start date and end date of workshop
 		
@@ -36,7 +36,13 @@ public class MasterCleanup {
 		
 		// S3 Cleanup
 		S3Cleanup s3Cleanup = new S3Cleanup();
-		s3Cleanup.startCleanup(startCal,endCal);
+		//s3Cleanup.startCleanup(startCal,endCal);
+		
+		// Route53 Cleanup
+		Route53Cleanup r53Cleanup = new Route53Cleanup();
+		
+		r53Cleanup.startCleanup(startCal, endCal);
+		
 		
 	}
 
