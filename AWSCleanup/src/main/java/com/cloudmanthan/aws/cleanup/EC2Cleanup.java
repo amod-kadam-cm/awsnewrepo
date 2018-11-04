@@ -48,7 +48,7 @@ import com.amazonaws.services.ec2.model.Vpc;
 public class EC2Cleanup {
 	static Logger LOGGER = Logger.getLogger(EC2Cleanup.class.getName());
 	private static AmazonEC2 ec2Client;
-	private static CharSequence clientInitials = "jd";
+	private static CharSequence clientInitials = "cp";
 
 	static WorkshopCalendar workshopCalendar;
 
@@ -74,7 +74,7 @@ public class EC2Cleanup {
 		workShopCal = Calendar.getInstance();
 		workShopCal.clear();
 		// this is the start date of workshop
-		workShopCal.set(2018, Calendar.SEPTEMBER, 6);
+		workShopCal.set(2018, Calendar.OCTOBER, 22);
 
 	}
 
@@ -378,7 +378,7 @@ public class EC2Cleanup {
 					LOGGER.info("Deleting VPC with Name : " + tagValue);
 
 					DeleteVpcRequest delVPCReq = new DeleteVpcRequest().withVpcId(vpcId);
-					// ec2Client.deleteVpc(delVPCReq );
+					ec2Client.deleteVpc(delVPCReq );
 
 				}
 			}
