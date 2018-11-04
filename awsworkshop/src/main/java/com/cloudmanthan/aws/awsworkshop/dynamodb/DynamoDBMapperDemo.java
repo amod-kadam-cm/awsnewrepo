@@ -10,6 +10,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Page;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -75,6 +76,7 @@ public class DynamoDBMapperDemo {
 		System.out.println("Value is" + obj);
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void putItem() {
 		CatalogItem item = new CatalogItem();
 		item.setId(102);
@@ -82,9 +84,14 @@ public class DynamoDBMapperDemo {
 		item.setISBN("222-2222222222");
 		item.setBookAuthors(new HashSet<String>(Arrays.asList("Author 1", "Author 2")));
 		item.setSomeProp("Test");
-		item.setVersion(1L);
+		//item.setVersion(1L);
 
+		// Optimistic Locking is enabled by default
 		mapper.save(item);
+
+		// Optimistic Locking DISABLED
+
+		//mapper.save(item, new DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.CLOBBER));
 
 	}
 

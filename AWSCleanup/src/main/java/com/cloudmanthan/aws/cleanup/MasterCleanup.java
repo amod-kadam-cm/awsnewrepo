@@ -11,7 +11,7 @@ public class MasterCleanup {
 		Calendar startCal = Calendar.getInstance();
 		startCal.clear();
 		// this is the start date of workshop
-		startCal.set(2018, Calendar.OCTOBER, 22);
+		startCal.set(2018, Calendar.JULY, 27);
 		
 		Calendar endCal = Calendar.getInstance();
 		endCal.clear();
@@ -28,8 +28,8 @@ public class MasterCleanup {
 			
 		EC2Cleanup ec2Cleanup = new EC2Cleanup(startCal,endCal);
 		
-		//ec2Cleanup.startCleanup();
 		
+		//ec2Cleanup.startCleanup();
 		// RDS cleanup
 		RDSCleanup rdsCleanup = new RDSCleanup();
 		//rdsCleanup.startCleanup(startCal,endCal);
@@ -41,7 +41,13 @@ public class MasterCleanup {
 		// Route53 Cleanup
 		Route53Cleanup r53Cleanup = new Route53Cleanup();
 		
-		r53Cleanup.startCleanup(startCal, endCal);
+		//r53Cleanup.startCleanup(startCal, endCal);
+		
+		// API Gateway Cleanup
+		APIGatewayCleanup apiGgateWayCleanup = new APIGatewayCleanup();
+		
+		apiGgateWayCleanup.startCleanup(startCal, endCal);
+		
 		
 		
 	}
