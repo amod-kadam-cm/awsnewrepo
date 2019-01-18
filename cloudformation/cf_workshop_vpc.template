@@ -1,0 +1,216 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Building A VPC from Scratch with CloudFormation with 2 public and 2 private subnets. Accept CIDR block as a parameter for VPC and Subnet",
+  "Parameters" : {
+    "vpcCidrBlock" : {
+      "Type" : "String",
+      "Default" : "10.0.0.0/16"
+    },
+    "publicSubnet1CidrBlock" : {
+      "Type" : "String",
+      "Default" : "10.0.0.0/20"
+    },
+    "publicSubnet2CidrBlock" : {
+      "Type" : "String",
+      "Default" : "10.0.16.0/20"
+    },
+    "privateSubnet1CidrBlock" : {
+      "Type" : "String",
+      "Default" : "10.0.32.0/20"
+    },
+    "privateSubnet2CidrBlock" : {
+      "Type" : "String",
+      "Default" : "10.0.48.0/20"
+    }
+  },
+  "Resources" : {
+    "WorkshopVPC" : {
+      "Type" : "AWS::EC2::VPC",
+      "Properties" : {
+        "EnableDnsSupport" : "true",
+        "EnableDnsHostnames" : "true",
+        "CidrBlock" : {
+          "Ref" : "vpcCidrBlock"
+        },
+        "Tags" : [ {
+          "Key" : "Application",
+          "Value" : {
+            "Ref" : "AWS::StackName"
+          }
+        }, {
+          "Key" : "Name",
+          "Value" : "Workshop"
+        } ]
+      }
+    },
+    "PublicSubnet1" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        },
+        "CidrBlock" : {
+          "Ref" : "publicSubnet1CidrBlock"
+        },
+        "MapPublicIpOnLaunch" : "true",
+        "Tags" : [ {
+          "Key" : "Application",
+          "Value" : {
+            "Ref" : "AWS::StackName"
+          }
+        }, {
+          "Key" : "Name",
+          "Value" : "Public"
+        } ]
+      }
+    },
+    "PublicSubnet2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        },
+        "CidrBlock" : {
+          "Ref" : "publicSubnet2CidrBlock"
+        },
+        "MapPublicIpOnLaunch" : "true",
+        "Tags" : [ {
+          "Key" : "Application",
+          "Value" : {
+            "Ref" : "AWS::StackName"
+          }
+        }, {
+          "Key" : "Name",
+          "Value" : "Public-Subnet-2"
+        } ]
+      }
+    },
+    "PrivateSubnet1" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        },
+        "CidrBlock" : {
+          "Ref" : "privateSubnet1CidrBlock"
+        },
+        "Tags" : [ {
+          "Key" : "Application",
+          "Value" : {
+            "Ref" : "AWS::StackName"
+          }
+        }, {
+          "Key" : "Name",
+          "Value" : "Private-Subnet-1"
+        } ]
+      }
+    },
+    "PrivateSubnet2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        },
+        "CidrBlock" : {
+          "Ref" : "privateSubnet2CidrBlock"
+        },
+        "Tags" : [ {
+          "Key" : "Application",
+          "Value" : {
+            "Ref" : "AWS::StackName"
+          }
+        }, {
+          "Key" : "Name",
+          "Value" : "Private-Subnet-2"
+        } ]
+      }
+    },
+    "WorkshopInternetGateway" : {
+      "Type" : "AWS::EC2::InternetGateway"
+    },
+    "GatewaytoInternet" : {
+      "Type" : "AWS::EC2::VPCGatewayAttachment",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        },
+        "InternetGatewayId" : {
+          "Ref" : "WorkshopInternetGateway"
+        }
+      }
+    },
+    "PublicRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        }
+      }
+    },
+    "PrivateRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : {
+          "Ref" : "WorkshopVPC"
+        }
+      }
+    },
+    "PublicRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "GatewaytoInternet",
+      "Properties" : {
+        "RouteTableId" : {
+          "Ref" : "PublicRouteTable"
+        },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : {
+          "Ref" : "WorkshopInternetGateway"
+        }
+      }
+    },
+    "PublicSubnetRouteAssociation1" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : {
+          "Ref" : "PublicSubnet1"
+        },
+        "RouteTableId" : {
+          "Ref" : "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnetRouteAssociation2" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : {
+          "Ref" : "PublicSubnet2"
+        },
+        "RouteTableId" : {
+          "Ref" : "PublicRouteTable"
+        }
+      }
+    },
+    "PrivateSubnetRouteAssociation1" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : {
+          "Ref" : "PrivateSubnet1"
+        },
+        "RouteTableId" : {
+          "Ref" : "PrivateRouteTable"
+        }
+      }
+    },
+    "PrivateSubnetRouteAssociation2" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : {
+          "Ref" : "PrivateSubnet2"
+        },
+        "RouteTableId" : {
+          "Ref" : "PrivateRouteTable"
+        }
+      }
+    }
+  }
+}
