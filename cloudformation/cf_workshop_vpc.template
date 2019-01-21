@@ -60,7 +60,7 @@
           }
         }, {
           "Key" : "Name",
-          "Value" : "Public"
+          "Value" : "Public-Subnet-1"
         } ]
       }
     },
