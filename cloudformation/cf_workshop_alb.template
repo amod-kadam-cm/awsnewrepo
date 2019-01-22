@@ -1,0 +1,76 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Creates an ALB , TargetGroup in the specified VPC. See example of using CloudFormation::Interface",
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [ {
+        "Label" : {
+          "default" : "Load Balancer Configuration"
+        },
+        "Parameters" : [ "SubnetAZ1Parameter", "SubnetAZ2Parameter" ]
+      }, {
+        "Label" : {
+          "default" : "Target Group Configuration"
+        },
+        "Parameters" : [ "WorkshopVpcParam" ]
+      } ],
+      "ParameterLabels" : {
+        "WorkshopVpcParam" : {
+          "default" : "Which VPC should this be deployed to?"
+        }
+      }
+    }
+  },
+  "Parameters" : {
+    "WorkshopVpcParam" : {
+      "Type" : "AWS::EC2::VPC::Id",
+      "Description" : "Select the VPC for ALB TargetGroups"
+    },
+    "SubnetAZ1Parameter" : {
+      "Type" : "AWS::EC2::Subnet::Id",
+      "Description" : "Choose Subnet from AZ1 "
+    },
+    "SubnetAZ2Parameter" : {
+      "Type" : "AWS::EC2::Subnet::Id",
+      "Description" : "Choose Subnet from AZ2"
+    }
+  },
+  "Resources" : {
+    "WorkshopALB" : {
+      "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties" : {
+        "Type" : "application",
+        "Subnets" : [ {
+          "Ref" : "SubnetAZ1Parameter"
+        }, {
+          "Ref" : "SubnetAZ2Parameter"
+        } ],
+        "Scheme" : "internet-facing"
+      }
+    },
+    "HttpdTargetGrop" : {
+      "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties" : {
+        "HealthCheckIntervalSeconds" : 60,
+        "HealthCheckPath" : "/",
+        "HealthCheckProtocol" : "HTTP",
+        "HealthCheckTimeoutSeconds" : 30,
+        "HealthyThresholdCount" : 5,
+        "Matcher" : {
+          "HttpCode" : "200"
+        },
+        "Name" : "WorkshopHttpdTargetGroup",
+        "Port" : "80",
+        "Protocol" : "HTTP",
+        "TargetType" : "instance",
+        "VpcId" : {
+          "Ref" : "WorkshopVpcParam"
+        },
+        "Tags" : [ {
+          "Key" : "NAME",
+          "Value" : "WorkshopHttpdTargetGroup"
+        } ]
+      }
+    }
+  }
+}
