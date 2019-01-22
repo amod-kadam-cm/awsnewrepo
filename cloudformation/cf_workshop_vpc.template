@@ -39,7 +39,7 @@
           }
         }, {
           "Key" : "Name",
-          "Value" : "Workshop"
+          "Value" : "Workshop-StackPolicy"
         } ]
       }
     },
@@ -60,7 +60,7 @@
           }
         }, {
           "Key" : "Name",
-          "Value" : "Public-Subnet-1"
+          "Value" : "Public-Subnet-1-Stack-Policy"
         } ]
       }
     },
