@@ -37,11 +37,11 @@ public class RegProxy implements RequestHandler<APIGatewayProxyRequestEvent, API
         try {
             Map<String, String> qps = event.getQueryStringParameters();
             if (qps != null) {
-                if (qps.get("name") != null) {
-                    name = qps.get("name");
+                if (qps.get("firstname") != null) {
+                	firstname = qps.get("firstname");
                 }
-                if (qps.get("city") != null) {
-                    city = qps.get("city");
+                if (qps.get("lastname") != null) {
+                	lastname = qps.get("lastname");
                 }
             }
 
