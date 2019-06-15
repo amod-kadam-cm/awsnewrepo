@@ -46,7 +46,7 @@ public class Route53Cleanup extends ServiceCleanupBase {
 
 			if (regionSet.contains(regionName) == false) {
 
-				route53Client = AmazonRoute53ClientBuilder.standard().withCredentials(awsCreds)
+				route53Client = AmazonRoute53ClientBuilder.standard().withCredentials(awsCredentialsProvider)
 						.build();
 
 				try {

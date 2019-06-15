@@ -12,7 +12,10 @@ import com.amazonaws.services.autoscaling.AmazonAutoScaling;
 import com.amazonaws.services.autoscaling.AmazonAutoScalingClientBuilder;
 import com.amazonaws.services.autoscaling.model.AutoScalingGroup;
 import com.amazonaws.services.autoscaling.model.DeleteAutoScalingGroupRequest;
+import com.amazonaws.services.autoscaling.model.DeleteLaunchConfigurationRequest;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsResult;
+import com.amazonaws.services.autoscaling.model.DescribeLaunchConfigurationsResult;
+import com.amazonaws.services.autoscaling.model.LaunchConfiguration;
 
 public class AutoScalingCleanup extends ServiceCleanupBase implements ICleanup {
 
@@ -58,6 +61,24 @@ public class AutoScalingCleanup extends ServiceCleanupBase implements ICleanup {
 					LOGGER.info("DELETED  AutoScalingGroup with name : " + asgName );
 
 				}
+				// Now cleanup Launch Configurations
+				DescribeLaunchConfigurationsResult lcResult = client.describeLaunchConfigurations();
+				
+				List<LaunchConfiguration> listLCs = lcResult.getLaunchConfigurations();
+				
+				Iterator<LaunchConfiguration> lcConfigIterator = listLCs.iterator();
+				while (lcConfigIterator.hasNext()) {
+					LaunchConfiguration lcConfig =  lcConfigIterator.next();
+					String lcName = lcConfig.getLaunchConfigurationName();
+					
+					LOGGER.info("DELETING LaunchConfiguration with name : " + lcName );
+
+					DeleteLaunchConfigurationRequest arg0 = new DeleteLaunchConfigurationRequest().withLaunchConfigurationName(lcName);
+					client.deleteLaunchConfiguration(arg0);
+					LOGGER.info("DELETED  LaunchConfiguration with name : " + lcName );
+				}
+				
+				
 			}
 		} // for region
 

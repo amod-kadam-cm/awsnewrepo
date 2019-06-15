@@ -48,7 +48,7 @@ import com.amazonaws.services.ec2.model.Vpc;
 public class EC2Cleanup {
 	static Logger LOGGER = Logger.getLogger(EC2Cleanup.class.getName());
 	private static AmazonEC2 ec2Client;
-	private static CharSequence clientInitials = "cp";
+	private static CharSequence clientInitials = "ge";
 
 	static WorkshopCalendar workshopCalendar;
 
@@ -74,7 +74,9 @@ public class EC2Cleanup {
 		workShopCal = Calendar.getInstance();
 		workShopCal.clear();
 		// this is the start date of workshop
-		workShopCal.set(2018, Calendar.OCTOBER, 22);
+		workShopCal.set(2018, Calendar.NOVEMBER, 20);
+		// this is the start date of workshop
+		workShopCal.set(2018, Calendar.NOVEMBER, 20);
 
 	}
 
@@ -208,6 +210,7 @@ public class EC2Cleanup {
 		regionSet.add("us-gov-west-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
+		regionSet.add("ap-south-1");
 
 		// iterate for all regions
 
@@ -297,14 +300,14 @@ public class EC2Cleanup {
 				cleanupSnapshots();
 				// Cleanup AMIs
 				cleanupAMIS();
-
 				// Cleanup Volumes
 				cleanupVolumes();
 				// cleanup security groups
 				cleanupSGS();
 
-				cleanupVPCs();
-
+				// cleanupVPCs();
+				
+			
 			} // if region !=
 		}
 	}
@@ -355,6 +358,11 @@ public class EC2Cleanup {
 		Filter filter = new Filter();
 		filter.setName("tag-key");
 
+		ArrayList<String> listValues = new ArrayList<String>();
+
+		listValues.add("del");
+		filter.setValues(listValues);
+
 		req.setFilters(filters);
 
 		DescribeVpcsResult result = ec2Client.describeVpcs(req);
@@ -378,7 +386,7 @@ public class EC2Cleanup {
 					LOGGER.info("Deleting VPC with Name : " + tagValue);
 
 					DeleteVpcRequest delVPCReq = new DeleteVpcRequest().withVpcId(vpcId);
-					ec2Client.deleteVpc(delVPCReq );
+					ec2Client.deleteVpc(delVPCReq);
 
 				}
 			}

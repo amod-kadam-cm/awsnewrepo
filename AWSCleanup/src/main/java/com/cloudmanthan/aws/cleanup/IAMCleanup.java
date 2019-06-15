@@ -30,7 +30,7 @@ public class IAMCleanup {
 	
 	static String userName = null;
 	
-	static String clientInitials = "siemens"; // John Deere
+	static String clientInitials = "ge"; // John Deere
 	
 	static int EQUAL = 0;
 	

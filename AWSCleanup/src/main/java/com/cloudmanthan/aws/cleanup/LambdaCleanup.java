@@ -39,6 +39,7 @@ public class LambdaCleanup  {
 		regionSet.add("us-gov-west-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
+		regionSet.add("ap-south-1");
 		
 		// iterate over all regions
 

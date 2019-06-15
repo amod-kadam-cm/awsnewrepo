@@ -19,9 +19,12 @@ import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClientBuilder;
 import com.amazonaws.services.ecs.model.Cluster;
 import com.amazonaws.services.ecs.model.DeleteClusterRequest;
+import com.amazonaws.services.ecs.model.DeleteServiceRequest;
 import com.amazonaws.services.ecs.model.DeregisterTaskDefinitionRequest;
 import com.amazonaws.services.ecs.model.DescribeClustersResult;
 import com.amazonaws.services.ecs.model.ListClustersResult;
+import com.amazonaws.services.ecs.model.ListServicesRequest;
+import com.amazonaws.services.ecs.model.ListServicesResult;
 import com.amazonaws.services.ecs.model.ListTaskDefinitionsResult;
 
 public class ECSClusterCleanup {
@@ -39,7 +42,7 @@ public class ECSClusterCleanup {
 		
 	}
 
-	private static void startCleanup() {
+	public static void startCleanup() {
 
 		AmazonECS ecsClient = null;
 
@@ -50,6 +53,8 @@ public class ECSClusterCleanup {
 		regionSet.add("us-gov-west-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
+		regionSet.add("ap-south-1");
+
 
 		for (Regions region : Regions.values()) {
 
@@ -75,6 +80,25 @@ public class ECSClusterCleanup {
 					//LOGGER.info("DELETTING CLUSTER " + cluster.getClusterName() );
 				
 					//LOGGER.info("CLUSTER ARN IS " + clusterARN);
+					
+					// Get the ECS Service list
+					
+					ListServicesRequest arg0 = new ListServicesRequest()
+							.withCluster(clusterARN);
+					
+					ListServicesResult result = ecsClient.listServices(arg0 );
+					
+					List<String> serviceList = result.getServiceArns();
+					
+					for (String service : serviceList) {
+						DeleteServiceRequest arg1 = new DeleteServiceRequest()
+								.withService(service)
+								.withCluster(clusterARN)
+								.withForce(true);
+						ecsClient.deleteService(arg1 );
+						
+					}
+					
 					
 					DeleteClusterRequest request = new DeleteClusterRequest()
 							.withCluster(clusterARN);
