@@ -50,7 +50,7 @@ public class ServerSideEncryptionUsingSSE {
             downloadObject(bucketName, keyName);
     
             // Verify that the object is properly encrypted by attempting to retrieve it
-            // using the encryption key.
+         
             retrieveObjectMetadata(bucketName, keyName);
     
             // Copy the object into a new object that also uses SSE-C.
@@ -95,8 +95,7 @@ public class ServerSideEncryptionUsingSSE {
     
     private static void copyObject(String bucketName, String keyName, String targetKeyName)
             throws NoSuchAlgorithmException {
-        // Create a new encryption key for target so that the target is saved using SSE-C.
-      //  SSECustomerKey newSSEKey = new SSECustomerKey(KEY_GENERATOR.generateKey());
+    
 
         CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, keyName, bucketName, targetKeyName);
         
