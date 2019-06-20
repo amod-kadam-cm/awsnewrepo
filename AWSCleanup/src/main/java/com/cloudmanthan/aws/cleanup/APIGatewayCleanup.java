@@ -67,7 +67,7 @@ public class APIGatewayCleanup extends ServiceCleanupBase implements ICleanup {
 
 						Date createdDate = restAPI.getCreatedDate();
 
-						if (CMDateUtils.isDateWithinWorkShopDate(super.workShopCal, super.workShopendCal,
+						if (CMDateUtils.isDateWithinWorkShopDate(super.workShopStartCal, super.workShopendCal,
 								createdDate) == true) {
 							
 							LOGGER.log(Level.INFO, "Deleting  rest api" + restAPI.getId());

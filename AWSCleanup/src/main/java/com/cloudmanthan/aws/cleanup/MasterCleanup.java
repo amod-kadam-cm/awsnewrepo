@@ -6,7 +6,7 @@ public class MasterCleanup {
 
 	private static final boolean AUTOSCALING_CLEANUP = false;
 	private static final boolean ECSCLUSTER_CLEANUP = false;
-	private static final boolean EC2_CLEANUP = false;
+	private static final boolean EC2_CLEANUP = true;
 	private static final boolean RDS_CLEANUP = false;
 	private static final boolean ROUTE_53_CLEANUP = false;
 	private static final boolean APIGATEWAY_CLEANUP = false;
@@ -22,7 +22,7 @@ public class MasterCleanup {
 		Calendar startCal = Calendar.getInstance();
 		startCal.clear();
 		// this is the start date of workshop
-		startCal.set(2019, Calendar.JUNE, 10);
+		startCal.set(2016, Calendar.SEPTEMBER, 10);
 
 		Calendar endCal = Calendar.getInstance();
 		endCal.clear();

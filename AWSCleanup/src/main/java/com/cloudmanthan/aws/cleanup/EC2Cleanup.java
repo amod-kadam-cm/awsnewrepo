@@ -44,10 +44,13 @@ import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.Volume;
 import com.amazonaws.services.ec2.model.Vpc;
+import com.cloudmanthan.aws.utils.CMDateUtils;
 
-public class EC2Cleanup {
+public class EC2Cleanup extends ServiceCleanupBase {
+
 	static Logger LOGGER = Logger.getLogger(EC2Cleanup.class.getName());
 	private static AmazonEC2 ec2Client;
+
 	private static CharSequence clientInitials = "ge";
 
 	static WorkshopCalendar workshopCalendar;
@@ -55,29 +58,12 @@ public class EC2Cleanup {
 	static Calendar workShopCal = null;
 
 	public EC2Cleanup(Calendar startCal, Calendar endCal) {
-		workShopCal = Calendar.getInstance();
-		workShopCal.clear();
-		workShopCal.set(startCal.get(Calendar.YEAR), startCal.get(Calendar.MONTH), startCal.get(Calendar.DAY_OF_MONTH));
-	}
+		super.startCleanup(startCal, endCal);
 
-	public static void main(String[] args) {
-
-		setWorkshopDate();
-
-		startCleanup();
-
-	}
-
-	private static void setWorkshopDate() /** start the workshop date */
-	{
-
-		workShopCal = Calendar.getInstance();
-		workShopCal.clear();
-		// this is the start date of workshop
-		workShopCal.set(2018, Calendar.NOVEMBER, 20);
-		// this is the start date of workshop
-		workShopCal.set(2018, Calendar.NOVEMBER, 20);
-
+		// workShopCal = Calendar.getInstance();
+		// workShopCal.clear();
+		// workShopCal.set(startCal.get(Calendar.YEAR), startCal.get(Calendar.MONTH),
+		// startCal.get(Calendar.DAY_OF_MONTH));
 	}
 
 	private static void cleanupAMIS() {
@@ -143,7 +129,7 @@ public class EC2Cleanup {
 
 	}
 
-	private static void cleanupSnapshots() {
+	private void cleanupSnapshots() {
 
 		DescribeSnapshotsRequest request = new DescribeSnapshotsRequest();
 
@@ -167,6 +153,7 @@ public class EC2Cleanup {
 		// display only private
 
 		// start-time
+		LOGGER.info("GETTING SNAPSHOTS  ");
 
 		List<Snapshot> snapList = result.getSnapshots();
 
@@ -174,17 +161,15 @@ public class EC2Cleanup {
 
 			Date snapShotCreationDate = snapshot.getStartTime();
 
-			Calendar workShopcal = Calendar.getInstance();
-			// TODO : Parameterize it to accept the from date and to date
-			/*
-			 * workShopcal.clear(); workShopcal.set(2018, Calendar.JULY, 10);
-			 */
+			//Calendar workShopcal = Calendar.getInstance();
 
-			Calendar snapShotCreationCal = Calendar.getInstance();
+			//Calendar snapShotCreationCal = Calendar.getInstance();
 
-			snapShotCreationCal.setTime(snapShotCreationDate);
+			//snapShotCreationCal.setTime(snapShotCreationDate);
 
-			if (true == snapShotCreationCal.after(workShopcal)) {
+			if (true == CMDateUtils.isDateWithinWorkShopDate(workShopStartCal, workShopendCal,
+			snapShotCreationDate)) {
+			//if (true == snapShotCreationCal.(workShopcal)) {
 
 				LOGGER.info("SNAPSHOT Information " + snapshot.toString());
 
@@ -198,19 +183,20 @@ public class EC2Cleanup {
 
 			}
 		}
-
 	}
 
-	public static void startCleanup() {
+	public void startCleanup() {
 
 		String profile = "amod_cmworkshop";
 		AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
 		Set<String> regionSet = new HashSet<String>();
 
 		regionSet.add("us-gov-west-1");
+		regionSet.add("us-gov-east-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
 		regionSet.add("ap-south-1");
+		regionSet.add("ap-east-1");
 
 		// iterate for all regions
 
@@ -296,18 +282,18 @@ public class EC2Cleanup {
 
 				}
 
-				// cleanup snapshots
-				cleanupSnapshots();
 				// Cleanup AMIs
 				cleanupAMIS();
+				// cleanup snapshots
+				cleanupSnapshots();
+
 				// Cleanup Volumes
 				cleanupVolumes();
 				// cleanup security groups
 				cleanupSGS();
 
 				// cleanupVPCs();
-				
-			
+
 			} // if region !=
 		}
 	}
