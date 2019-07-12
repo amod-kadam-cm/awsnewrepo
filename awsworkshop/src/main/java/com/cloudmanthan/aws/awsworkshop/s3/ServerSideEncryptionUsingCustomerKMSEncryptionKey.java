@@ -27,7 +27,7 @@ import com.amazonaws.services.s3.model.SSECustomerKey;
 public class ServerSideEncryptionUsingCustomerKMSEncryptionKey {
     private static AmazonS3 S3_CLIENT;
     // change the value of KMSKeyId to the appropriate key 
-    private static String customerKMSKey = "arn:aws:kms:ap-south-1:123456789012:key/8208d5b8-4000-45cc-8587-a64d640be2f3";  
+    private static String customerKMSKey = "arn:aws:kms:ap-south-1:297106433303:key/8208d5b8-4000-45cc-8587-a64d640be2f3";  
     
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
@@ -99,8 +99,7 @@ public class ServerSideEncryptionUsingCustomerKMSEncryptionKey {
     
     private static void copyObject(String bucketName, String keyName, String targetKeyName)
             throws NoSuchAlgorithmException {
-        // Create a new encryption key for target so that the target is saved using SSE-C.
-        //SECustomerKey newSSEKey = new SSECustomerKey(KEY_GENERATOR.generateKey());
+      
 
         CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, keyName, bucketName, targetKeyName)
         		.withSSEAwsKeyManagementParams(new SSEAwsKeyManagementParams(customerKMSKey));

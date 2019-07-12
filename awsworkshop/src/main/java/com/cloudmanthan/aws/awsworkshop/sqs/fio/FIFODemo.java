@@ -41,7 +41,7 @@ public class FIFODemo {
 
 		intiSQSClient();
 
-		// SendMessage();
+		SendMessages();
 
 		// ReceiveMessages from Queue
 		// ReceiveMessages(false);
@@ -50,7 +50,7 @@ public class FIFODemo {
 		// ReceiveMessages(true);
 
 		/* demo for group-id */
-		SendMessagewithMessageGroup();
+		//SendMessagewithMessageGroup();
 
 	}
 
@@ -90,7 +90,7 @@ public class FIFODemo {
 		sqs = AmazonSQSClientBuilder.defaultClient();
 	}
 
-	private static void SendMessage() {
+	private static void SendMessages() {
 		try {
 
 			// Send a message.

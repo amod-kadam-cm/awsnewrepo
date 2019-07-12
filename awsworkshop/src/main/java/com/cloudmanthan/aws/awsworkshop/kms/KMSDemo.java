@@ -27,7 +27,9 @@ public class KMSDemo {
 	static AWSKMS kmsClient = AWSKMSClientBuilder.defaultClient();
 
 	// Point to actual keyId from your account
-	static String keyId = "arn:aws:kms:ap-south-1:xxxxxxxxxxxx:key/8208d5b8-4000-45cc-8587-a64d640be2f3";
+	//static String keyId = "arn:aws:kms:ap-south-1:xxxxxxxxxxxx:key/8208d5b8-4000-45cc-8587-a64d640be2f3";
+	
+	static String keyId = "arn:aws:kms:ap-south-1:xyyyyyy:key/5526636a-30e2-4722-ad0f-bcea58b85963"; 
 
 	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
@@ -42,7 +44,7 @@ public class KMSDemo {
 		// Prepare DataKeyRequest
 		GenerateDataKeyRequest dataKeyRequest = new GenerateDataKeyRequest();
 		// Specify the CMK to be used for encrypting Data Key
-		dataKeyRequest.setKeyId(keyId);
+		//dataKeyRequest.setKeyId(keyId);
 		// choose the key spec
 		dataKeyRequest.setKeySpec("AES_256");
 
