@@ -77,6 +77,10 @@ public class DynamoDBCleanup {
 		regionSet.add("us-gov-west-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
+		regionSet.add("ap-south-1");
+		regionSet.add("us-gov-east-1");
+		regionSet.add("ap-east-1");
+
 
 		// iterate for all regions
 

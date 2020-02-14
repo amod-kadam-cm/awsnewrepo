@@ -24,6 +24,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>bom</artifactId>
+				<version>2.1.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -35,6 +42,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-core</artifactId>
+
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ec2 -->
 		<dependency>
@@ -134,13 +147,31 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-logs</artifactId>
 		</dependency>
-<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-elasticloadbalancingv2 -->
-<dependency>
-    <groupId>com.amazonaws</groupId>
-    <artifactId>aws-java-sdk-elasticloadbalancingv2</artifactId>
-    <version>1.11.572</version>
-</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-elasticloadbalancingv2 -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-elasticloadbalancingv2</artifactId>
+			<version>1.11.572</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sqs -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-sqs</artifactId>
+			<version>1.11.580</version>
+		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.9</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-events -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-events</artifactId>
+		</dependency>
 
 
 	</dependencies>

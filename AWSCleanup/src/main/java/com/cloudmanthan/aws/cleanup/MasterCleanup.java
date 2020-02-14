@@ -5,15 +5,17 @@ import java.util.Calendar;
 public class MasterCleanup {
 
 	private static final boolean AUTOSCALING_CLEANUP = false;
-	private static final boolean ECSCLUSTER_CLEANUP = false;
+	private static final boolean ECSCLUSTER_CLEANUP = false ;
 	private static final boolean EC2_CLEANUP = true;
-	private static final boolean RDS_CLEANUP = false;
-	private static final boolean ROUTE_53_CLEANUP = false;
-	private static final boolean APIGATEWAY_CLEANUP = false;
-	private static final boolean EB_CLEANUP = true;
-	private static final boolean S3_CLEANUP = true ;
-	private static final boolean CLOUDWATCH_LOGROUP_CLEANUP = true;
-	private static final boolean ELB_CLEANUP = true;
+	private static final boolean RDS_CLEANUP = true ;
+	private static final boolean ROUTE_53_CLEANUP = true  ;
+	private static final boolean APIGATEWAY_CLEANUP = false ;
+	private static final boolean EB_CLEANUP = false ;
+	private static final boolean S3_CLEANUP = true  ;
+	private static final boolean CLOUDWATCH_LOGROUP_CLEANUP = true  ;
+	private static final boolean CLOUDWATCH_EVENT_CLEANUP = true ;
+	private static final boolean ELB_CLEANUP = true  ;
+	private static final boolean SQS_CLEANUP = true  ;
 
 	public static void main(String[] args) {
 
@@ -22,12 +24,12 @@ public class MasterCleanup {
 		Calendar startCal = Calendar.getInstance();
 		startCal.clear();
 		// this is the start date of workshop
-		startCal.set(2016, Calendar.SEPTEMBER, 10);
+		startCal.set(2020, Calendar.FEBRUARY, 06);
 
 		Calendar endCal = Calendar.getInstance();
 		endCal.clear();
 		// this is the start date of workshop
-		endCal.set(2019, Calendar.JUNE, 14);
+		endCal.set(2020, Calendar.FEBRUARY, 14);
 
 		WorkshopCalendar workShopCalendar = new WorkshopCalendar();
 
@@ -88,6 +90,13 @@ public class MasterCleanup {
 			EBCleanup ebCleanup = new EBCleanup();
 			ebCleanup.startCleanup(startCal, endCal);
 		}
+		
+		if (true == SQS_CLEANUP) {
+
+			// Cleanup CloudWatchGroup
+			SQSCleanup sqsCleanup = new SQSCleanup();
+			sqsCleanup.startCleanup(startCal, endCal);
+		}
 		if (true == S3_CLEANUP) {
 
 			// S3 Cleanup
@@ -100,6 +109,13 @@ public class MasterCleanup {
 			// Cleanup CloudWatchGroup
 			CloudWatchLogGroupCleanup logGroupCleanup = new CloudWatchLogGroupCleanup();
 			logGroupCleanup.startCleanup(startCal, endCal);
+		}
+		
+		if (true == CLOUDWATCH_EVENT_CLEANUP) {
+
+			// Cleanup CloudWatchGroup
+			CloudWatchEventsCleanup eventCleanup = new CloudWatchEventsCleanup();
+			eventCleanup.startCleanup(startCal, endCal);
 		}
 	}
 

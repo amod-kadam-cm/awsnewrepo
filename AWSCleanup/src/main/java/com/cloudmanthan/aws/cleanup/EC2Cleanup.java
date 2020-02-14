@@ -59,14 +59,9 @@ public class EC2Cleanup extends ServiceCleanupBase {
 
 	public EC2Cleanup(Calendar startCal, Calendar endCal) {
 		super.startCleanup(startCal, endCal);
-
-		// workShopCal = Calendar.getInstance();
-		// workShopCal.clear();
-		// workShopCal.set(startCal.get(Calendar.YEAR), startCal.get(Calendar.MONTH),
-		// startCal.get(Calendar.DAY_OF_MONTH));
 	}
 
-	private static void cleanupAMIS() {
+	private void cleanupAMIS() {
 
 		DescribeImagesRequest request = new DescribeImagesRequest();
 
@@ -105,23 +100,28 @@ public class EC2Cleanup extends ServiceCleanupBase {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(date);
 
-				if (cal.after(workShopCal) == true) {
+				if (CMDateUtils.isDateWithinWorkShopDate(workShopStartCal, workShopEndCal, date) == true) {
+					{
 
-					LOGGER.info("Image Created after workshop " + image.getName());
-					LOGGER.info("Image Created On  " + image.getCreationDate());
+						// if (cal.after(workShopCal) == true) {
 
-					LOGGER.info("Deregistering image " + image.toString());
-					DeregisterImageRequest request1 = new DeregisterImageRequest();
-					request1.setImageId(imageId);
+						LOGGER.info("Image Created after workshop " + image.getName());
+						LOGGER.info("Image Created On  " + image.getCreationDate());
 
-					ec2Client.deregisterImage(request1);
+						LOGGER.info("Deregistering image " + image.toString());
+						DeregisterImageRequest request1 = new DeregisterImageRequest();
+						request1.setImageId(imageId);
 
-					LOGGER.info("Deregistered image " + image.toString());
+						ec2Client.deregisterImage(request1);
 
+						LOGGER.info("Deregistered image " + image.toString());
+
+					}
 				}
+			}
 
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
+			catch (ParseException e) {
+
 				e.printStackTrace();
 			}
 
@@ -161,15 +161,14 @@ public class EC2Cleanup extends ServiceCleanupBase {
 
 			Date snapShotCreationDate = snapshot.getStartTime();
 
-			//Calendar workShopcal = Calendar.getInstance();
+			// Calendar workShopcal = Calendar.getInstance();
 
-			//Calendar snapShotCreationCal = Calendar.getInstance();
+			// Calendar snapShotCreationCal = Calendar.getInstance();
 
-			//snapShotCreationCal.setTime(snapShotCreationDate);
+			// snapShotCreationCal.setTime(snapShotCreationDate);
 
-			if (true == CMDateUtils.isDateWithinWorkShopDate(workShopStartCal, workShopendCal,
-			snapShotCreationDate)) {
-			//if (true == snapShotCreationCal.(workShopcal)) {
+			if (true == CMDateUtils.isDateWithinWorkShopDate(workShopStartCal, workShopEndCal, snapShotCreationDate)) {
+				// if (true == snapShotCreationCal.(workShopcal)) {
 
 				LOGGER.info("SNAPSHOT Information " + snapshot.toString());
 
@@ -197,6 +196,8 @@ public class EC2Cleanup extends ServiceCleanupBase {
 		regionSet.add("cn-northwest-1");
 		regionSet.add("ap-south-1");
 		regionSet.add("ap-east-1");
+		regionSet.add("ap-southeast-1");
+		regionSet.add("ap-northeast-1");
 
 		// iterate for all regions
 
@@ -249,9 +250,10 @@ public class EC2Cleanup extends ServiceCleanupBase {
 
 						LOGGER.info(
 								"Instance with instance id " + instance.getInstanceId() + " launched on " + launchDate);
-
-						if (launchCal.after(workShopCal)) {
-							LOGGER.info("JD workshInstance with instance id " + instance.getInstanceId()
+						
+						if (true == CMDateUtils.isDateWithinWorkShopDate(workShopStartCal, workShopEndCal, launchDate)) {
+						//if (launchCal.after(workShopCal)) {
+							LOGGER.info("Instancd id " + instance.getInstanceId()
 									+ " launched on " + launchDate);
 
 							if (true == Arrays.asList("running", "pending", "stopping", "stopped")

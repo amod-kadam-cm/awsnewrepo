@@ -54,6 +54,8 @@ public class ECSClusterCleanup {
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
 		regionSet.add("ap-south-1");
+		regionSet.add("ap-east-1");
+		regionSet.add("us-gov-east-1");
 
 
 		for (Regions region : Regions.values()) {

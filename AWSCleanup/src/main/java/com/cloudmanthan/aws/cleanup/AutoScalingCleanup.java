@@ -25,11 +25,12 @@ public class AutoScalingCleanup extends ServiceCleanupBase implements ICleanup {
 		super.startCleanup(startCal, endCal);
 
 		Set<String> regionSet = new HashSet<String>();
-
 		regionSet.add("us-gov-west-1");
+		regionSet.add("us-gov-east-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
 		regionSet.add("ap-south-1");
+		regionSet.add("ap-east-1");
 
 		for (Regions region : Regions.values()) {
 
@@ -77,13 +78,9 @@ public class AutoScalingCleanup extends ServiceCleanupBase implements ICleanup {
 					client.deleteLaunchConfiguration(arg0);
 					LOGGER.info("DELETED  LaunchConfiguration with name : " + lcName );
 				}
-				
-				
 			}
 		} // for region
-
 	}
-
 }
 
 

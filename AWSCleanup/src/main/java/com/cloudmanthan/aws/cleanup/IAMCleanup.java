@@ -30,7 +30,7 @@ public class IAMCleanup {
 	
 	static String userName = null;
 	
-	static String clientInitials = "ge"; // John Deere
+	static String clientInitials = "nomura"; // John Deere
 	
 	static int EQUAL = 0;
 	
@@ -67,6 +67,7 @@ public class IAMCleanup {
 		
 		for (User iamUser: list ) {
 			userName = iamUser.getUserName();
+			
 		
 			String compareUserName = userName.toLowerCase();
 			clientInitials = clientInitials.toLowerCase();

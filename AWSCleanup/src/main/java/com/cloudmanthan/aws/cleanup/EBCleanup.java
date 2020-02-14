@@ -18,7 +18,10 @@ import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClient;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClientBuilder;
 import com.amazonaws.services.elasticbeanstalk.model.ApplicationDescription;
 import com.amazonaws.services.elasticbeanstalk.model.DeleteApplicationRequest;
+import com.amazonaws.services.elasticbeanstalk.model.DeleteApplicationVersionRequest;
 import com.amazonaws.services.elasticbeanstalk.model.DescribeApplicationsResult;
+import com.amazonaws.services.elasticbeanstalk.model.DescribeEnvironmentsResult;
+import com.amazonaws.services.elasticbeanstalk.model.EnvironmentDescription;
 
 public class EBCleanup extends ServiceCleanupBase implements ICleanup {
 	
@@ -34,6 +37,7 @@ public class EBCleanup extends ServiceCleanupBase implements ICleanup {
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
 		regionSet.add("ap-south-1");
+		regionSet.add("ap-east-1");
 
 		for (Regions region : Regions.values()) {
 
@@ -48,17 +52,32 @@ public class EBCleanup extends ServiceCleanupBase implements ICleanup {
 
 						AWSElasticBeanstalkClientBuilder.standard().withCredentials(awsCredentialsProvider)
 								.withRegion(region.getName()).build();
+				
+				// process environments
+				DescribeEnvironmentsResult environmentsResult  = client.describeEnvironments();
+				
+				List<EnvironmentDescription> envDescription = environmentsResult.getEnvironments();
+				
+			
+				
 
 				DescribeApplicationsResult groupResult = client.describeApplications();
 				
 				List<ApplicationDescription> applicationDescriptionList  = groupResult.getApplications();
-
+				
+				
 				
 				Iterator<ApplicationDescription> appIterator = applicationDescriptionList.iterator();
 				
 				while (appIterator.hasNext()) {
+					
+				
 					ApplicationDescription appDescription  = appIterator.next();
 					String applicationName  = appDescription.getApplicationName();
+					DeleteApplicationVersionRequest appVersion = new DeleteApplicationVersionRequest().withApplicationName(applicationName) ;
+					client.deleteApplicationVersion(appVersion );
+				
+					
 					LOGGER.info("DELETING Application with name : " + applicationName );
 					DeleteApplicationRequest arg0 = new DeleteApplicationRequest().withApplicationName(applicationName);
 					client.deleteApplication(arg0);

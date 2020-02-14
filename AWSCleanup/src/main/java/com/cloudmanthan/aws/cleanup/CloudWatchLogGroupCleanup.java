@@ -27,8 +27,12 @@ public class CloudWatchLogGroupCleanup extends ServiceCleanupBase {
 		Set<String> regionSet = new HashSet<String>();
 
 		regionSet.add("us-gov-west-1");
+		regionSet.add("us-gov-east-1");
 		regionSet.add("cn-north-1");
 		regionSet.add("cn-northwest-1");
+		regionSet.add("ca-central-1");
+		regionSet.add("ap-east-1");
+		
 
 		// iterate for all regions
 
@@ -36,6 +40,8 @@ public class CloudWatchLogGroupCleanup extends ServiceCleanupBase {
 			int i = 0;
 			String regionName = region.getName();
 
+			LOGGER.log(Level.INFO, "Region is :" + regionName);
+					
 			if (regionSet.contains(regionName) == false) {
 
 				AWSCredentialsProvider awsCreds = new ProfileCredentialsProvider(profile);
